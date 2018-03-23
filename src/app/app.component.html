@@ -1,0 +1,134 @@
+<div>List of Admins: <admins-list></admins-list></div>
+
+<div class="container-fluid">
+	<div id="activeFilters" class="card">
+		<div class="card-body">
+			<span class="h4">Active Filters: </span>
+			<button *ngFor="let item of checkedItems"
+					class="btn btn-outline-primary btn-sm text-none"
+					(click)="removeFilter(item);">
+				<i class="small bento-icon-close-x"></i> {{ item.label }}
+			</button>
+			<span *ngIf="checkedItemsExist()">
+				<a href="#" (click)="clearFilters()"> clear all</a>
+			</span>
+			<span *ngIf="checkedItemsExist()" style="float: right;">
+				<button class="btn btn-primary btn-sm" (click)="modalOpen(copyLink)">Get Email Link</button>
+				<button (click)="doStupid()">Do Stupid</button>
+			</span>
+		</div>
+	</div>
+	<div style="float: right; width: 20%;">
+	  
+       <select bentoSelect name="mySelect" class="form-control" 
+	           [(ngModel)]="courseSortOptionSelected" (ngModelChange)="onOptionSelected($event)">
+    		<option class='option' *ngFor='let option of courseSortOptions' [ngValue]='option.id'>{{option.value}}</option>
+        </select>	
+
+    </div>
+	<div style="float: left; width: 20%; min-width: 230px;">
+		<div>
+			<span class="h2">Search Filters</span>
+			<span *ngIf="checkedItemsExist()">
+				<a href="#" (click)="clearFilters()" style="padding-left: 25px; vertical-align: baseline;"> clear all</a>
+			</span>
+		</div>
+		<bento-tree
+			id="Formats"
+			[items]="treeDataFmt"
+			[itemIconProp]="'icon'"
+			[itemChildrenProp]="'items'"
+			[itemLabelProp]="'label'"
+			[multiSelect]="false"
+			[selectAsCheck]="true"
+			[showExpandCollapseAllButtons]="false"
+			(itemCheck)="onItemCheck($event,1)">
+		</bento-tree>
+		<bento-tree
+			id="CreditRange"
+			[items]="treeDataCred"
+			[itemIconProp]="'icon'"
+			[itemChildrenProp]="'items'"
+			[itemLabelProp]="'label'"
+			[multiSelect]="false"
+			[selectAsCheck]="true"
+			[showExpandCollapseAllButtons]="false"
+			(itemCheck)="onItemCheck($event,2)">
+		</bento-tree>
+		<bento-tree
+			id="Designations"
+			[items]="treeDataDes"
+			[itemIconProp]="'icon'"
+			[itemChildrenProp]="'items'"
+			[itemLabelProp]="'label'"
+			[multiSelect]="false"
+			[selectAsCheck]="true"
+			[showExpandCollapseAllButtons]="false"
+			(itemCheck)="onItemCheck($event,3)">
+		</bento-tree>
+		<bento-tree
+			id="FoS"
+			[items]="treeDataFos"
+			[itemIconProp]="'icon'"
+			[itemChildrenProp]="'items'"
+			[itemLabelProp]="'label'"
+			[multiSelect]="false"
+			[selectAsCheck]="true"
+			[showExpandCollapseAllButtons]="false"
+			(itemCheck)="onItemCheck($event,4)">
+		</bento-tree>
+		<bento-tree
+			id="Brand"
+			[items]="treeDataBrand"
+			[itemIconProp]="'icon'"
+			[itemChildrenProp]="'items'"
+			[itemLabelProp]="'label'"
+			[multiSelect]="false"
+			[selectAsCheck]="true"
+			[showExpandCollapseAllButtons]="false"
+			(itemCheck)="onItemCheck($event,5)">
+		</bento-tree>
+
+		<div><hr align="left" width="80%"></div>
+		<div>
+			<div>
+				<b>Start Date</b> <a href="#dStart" (click)="dStart.navigateTo({year: currentYear, month: currentMonth}); resetDateModel('Start');"> (reset)</a><br>
+				<ngb-datepicker name="dStart" [(ngModel)]="dpStartModel" #dStart (click)="onDateSelect('Start')"></ngb-datepicker>
+			</div>
+			<div><br></div>
+			<div>
+				<b>End Date</b> <a href="#dEnd" (click)="dEnd.navigateTo({year: currentYear, month: currentMonth}); resetDateModel('End');"> (reset)</a><br>
+				<ngb-datepicker name="dEnd" [(ngModel)]="dpEndModel" #dEnd (click)="onDateSelect('End')"></ngb-datepicker>
+			</div>
+		</div>
+	</div>
+
+	<div style="float: left; width: 80%;">
+		<h2>Search Results</h2>
+		<div *ngFor="let entry of filteredSearchData">
+			<hr>
+			<b>Title:</b> {{ entry.Title }}<br/>
+			<b>Description:</b> {{ entry.Desc }}<br/>
+			<b>FoS:</b> {{ FoS[entry.FoS] }}<br/>
+			<b>Format:</b> {{ Formats[entry.Formats] }}<br/>
+			<b>Credits:</b> {{ entry.Credits }}<br/>
+			<b>Brand:</b> {{ Brand[entry.Brand] }}
+		</div>
+	</div>
+</div>
+
+<!-- Email Link Modal -->
+<ng-template #copyLink let-c="close" let-d="dismiss">
+	<button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+		<i class="bento-icon-close-x" aria-hidden="true"></i>
+	</button>
+	<div class="modal-header">
+		Email Link
+	</div>
+<textarea #linkText id="linkText" name="linkText" columns="60" rows="4">
+{{ getEmailLink() }}
+</textarea>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-primary" [ngxClipboard]="linkText" (click)="c('Copy and Close');">Copy &amp; Dismiss</button>
+	</div>
+</ng-template>

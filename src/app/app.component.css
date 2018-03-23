@@ -1,0 +1,11 @@
+/* This is being used to override a Bento style transform */
+.text-none {
+	text-transform: none !important; 
+}
+
+/* I think this is a workaround for the buttons getting styled strangely */
+.btn.btn-sm {
+	font-family: Arial, "Helvetica Neue", sans-serif;
+	padding: 5px;
+	line-height: 0rem;
+}

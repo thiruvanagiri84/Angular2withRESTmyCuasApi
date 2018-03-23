@@ -1,0 +1,1 @@
+export * from './adminsdata/adminsdata.service';

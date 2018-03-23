@@ -1,0 +1,177 @@
+1. Create Angular2 Application using Angular CLI Or Use any existing working angular2 Application.
+2. In this case, I used existing application -->  C:\Santosh\STS_Workspace_CUAS\cpl-bento 
+3. Fyi, We already have directory src and inside that we have directory app --> Here we have main component (AppComponent)
+4. I created 2 new directories(admins & shared) inside app directory. 
+5. admins folder is for creating custom components, and its related Html, css files
+6. I created another sub folder inside shared folder. I call the folder name: adminsdata
+	And created a file named 'index.ts' which has the export statements to all our services.
+7. adminsdata folder has this file --> adminsdata.service.ts & has the logic to call REST api's.
+8. Wrote the below code inside adminsdata.service.ts
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
+
+@Injectable()
+export class AdminsdataService {
+
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<any> {
+    console.log(this.http.get('http://localhost:8070/adminslist/2787'));
+    return this.http.get('http://localhost:8070/adminslist/2787');
+  }
+}
+
+Observe HttpClient being imported into our application to call REST Api's
+Observe the line: this.http.get('http://localhost:8070/adminslist/2787');
+This is where GET method of my Springboot application is getting called.
+
+9. Wrote the below code insde src/app/admins/admins.component.ts
+
+import { Component, OnInit } from '@angular/core';
+import { AdminsdataService } from '../shared';
+
+@Component({
+  selector: 'admins-list',
+  templateUrl: './admins.component.html',
+  styleUrls: ['./admins.component.css'],
+  providers: [AdminsdataService]
+})
+
+export class AdminsComponent implements OnInit {
+    adminsArray: Array<any>;
+
+    constructor(private adminsService: AdminsdataService) { }
+
+    ngOnInit(){
+        this.adminsService.getAll().subscribe(
+            data => {
+                this.adminsArray = data;
+                console.log(this.adminsArray);
+                for(const admin of this.adminsArray){
+                    //do nothing
+                }
+            },
+            error => console.log(error)
+        )
+    }
+}
+
+Notice that we are importing AdminsdataService like --> import { AdminsdataService } from '../shared';
+We have not given the folder name inside /shared/adminsdata. 
+Angular will find out AdminsdataService inside /shared folder using index.ts file(given in step.11).
+Here we are constructing AdminsdataService and calling its method getAll(). 
+Storing the Response json array into adminsArray variable.
+Also, we are creating the component with Selector: 'admins-list', template html file and the providers(i.e, services)
+This admins-list will be our custom tag to be used in any Html file. 
+This tag will be replaced with our code in template html file during runtime.
+
+10. Wrote below code in admins.component.html 
+
+<h2>List of Organization Admins</h2>
+
+<div *ngFor="let admin of adminsArray">
+  {{admin.username}}<br>
+</div>
+
+Note *ngFor which is present in BrowserModule class, which is used to iterate through the list/array.
+adminsArray is our variable inside admins.component.ts
+
+11. Wrote below code in /src/app/shared/index.ts
+
+export * from './adminsdata/adminsdata.service';
+
+12. Register our component and its dependencies in the existing file /src/app/app.module.ts
+
+import { AdminsComponent } from './admins/admins.component';
+
+import { HttpClientModule } from '@angular/common/http';
+
+13. Register our component to @NgModule declarations
+
+@NgModule({
+
+	declarations: [
+
+	AppComponent,
+
+	AdminsComponent
+	
+],
+
+14. Register HttpClientModule to @NgModule imports
+
+imports: [
+
+BrowserModule,
+
+FormsModule,
+
+BentoModule,
+
+ClipboardModule,
+
+HttpClientModule,
+
+NgbModule.forRoot()
+	
+],
+
+15. Added the below line to /src/app/app.component.html file
+
+<div>List of Admins: <admins-list></admins-list></div>
+
+<admins-list> is our custom tag created in admins.component.ts file.
+This tag will be replaced with our template html file during runtime.
+
+16. Existing: Added below line to /src/index.html file
+
+<body>
+	
+  <app-root></app-root>
+
+</body>
+
+Also, notice below statements(used for bootstrap 4) inside html <head> tag of index.html file
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" defer></script>
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" defer></script>
+    
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" defer></script>
+</head>
+
+17. Once all the above steps are completed. Need to do run below command at the project directory 
+
+C:\Santosh\STS_Workspace_CUAS\cpl-bento>npm install
+
+18. Once npm install is successful, run below command
+
+C:\Santosh\STS_Workspace_CUAS\cpl-bento>npm start
+
+This will call ng-serve and open a development environment for us to view the html files in 
+http://localhost:4200/
+
+Need not call index.html seperately. Angular will direct call index.html as it is default starting file.
+
+19. To build the application use 
+
+C:\Santosh\STS_Workspace_CUAS\cpl-bento>npm run build
+
+This will create a directory 'dist' where we can see the generated .js files from our .ts files
+We can copy these 4 .js files below and paste them seperatly to whereever we need.
+
+chunk {inline} inline.bundle.js (inline) 5.79 kB [entry]
+chunk {main} main.bundle.js (main) 169 kB [initial] [rendered]
+chunk {polyfills} polyfills.bundle.js (polyfills) 932 kB [initial]
+chunk {styles} styles.bundle.js (styles) 1.56 MB [initial]
+chunk {vendor} vendor.bundle.js (vendor) 12.7 MB [initial] [rendered]
+
+I have copied this into another folder: C:\Santosh\STS_Workspace_CUAS\cpl-bento\Angular2DemoCPL
+I have created a test.html file which has custom tag <app-root> written in app.component.ts file.
+
+20. We can run this test.html file in any browser and the same behavior can be observed as in Angular app.
